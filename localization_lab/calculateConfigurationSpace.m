@@ -1,13 +1,20 @@
-%calculateConfigurationSpace produce the configuration Space representation
-%of a map based on the radius of the minimum circle that can fully
-%superscribe the robot. 
-
-%map: a occupancy grid representing where a robot can be (0) and where it can
-%not be located (1) 
-%robotRadius how far the configuration space should expand from boundary
-%robotRadius is in grid cells not meters because the scaling along x and y
-%does not have to be uniform.
+%
+%
 function [configurationMap] = calculateConfigurationSpace(map,robotRadius)
+%calculateConfigurationSpace Produce the Configuration Space that
+%       represents our world.
+%   Generate a Configuration Space map of all positions our robot can take
+%       in the world.  
+%       Note that we represent the robot as a circle, with the radius equal
+%       to the minimum circle that can fully circumscribe the robot. 
+%
+%   map Occupancy grid (MxN) representing where a robot can be (0) and 
+%        where it can't be (1)
+%   robotRadius how far the configuration space should expand from boundary
+%robotRadius is in grid cells not meters because the scaling along x and y
+%does not have to be uniform. 
+
+
     configurationMap = zeros(size(map,1),size(map,2));
     for i = 1:size(map,1)
         for j = 1:size(map,2)

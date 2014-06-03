@@ -1,4 +1,4 @@
-function [] = LocilizationLab( input_args )
+function [] = LocalizationLab()
 global DTH;      %Discrimination along th
 global ROBOTMODEL;
 global MAXERRORTH;
