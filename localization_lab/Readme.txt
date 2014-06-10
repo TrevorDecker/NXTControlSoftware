@@ -5,14 +5,30 @@ Configuring your system
 -----------------------
 Follow instruction in nxt/nxt/RWTHMindstormsNXT/ReadMe.txt to install matlab control code on nxt. 
 
-Remember to set your matlab path to include all of the localization lab path  
+Remember to set your Matlab path to include all of the localization lab path  
+
+
+Before you begin
+-----------------
+Run "config.m" to configure your workspace with the proper global variables. 
+
+
+Part 1 : Simulation
+--------------------
+
+
+Part 2 : Other part
+--------------------
+
+
+
 
 Files
 ------
 Edit the following files: 
     config.m 
-    ObeservationModel.m  
-    TransistionModel.m   
+    observationModel.m
+    transitionModel.m
     drive.m             
 
 Test your code with the following files:
