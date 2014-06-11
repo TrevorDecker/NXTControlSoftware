@@ -113,8 +113,24 @@ else
     end
 end
 dPose(3) = -dPose(3);
-r.pose(1:3) =r.pose(1:3) -  dPose;
-r.pose(3) = wrapTo2Pi(r.pose(3));
+%will check to see if motion is going to cause the robot to move into an
+%obstacle, if so then do not allow this motion and try to execute a small
+%random motion to get you away from the obstacle 
+while(1)
+    newPose =r.pose(1:3) -  dPose;
+    newPose(3) = wrapTo2Pi(newPose(3));
+    newPoseIndex(1) = round(newPose(1)/DX);
+    newPoseIndex(2) = round(newPose(2)/DY);
+    if newPoseIndex(1) > 0 && newPoseIndex(1) <= size(map,1) && ...
+        newPoseIndex(2) > 0 && newPoseIndex(2) <= size(map,2) && ...
+        map(newPoseIndex(1),newPoseIndex(2)) == 0
+        r.pose = newPose;
+        break;
+    else
+         dPose = rand(1,3)*.1;
+        'hit wall'
+    end
+end
 
 measurment = r.Sense(map);
 pM = transitionModel(pM,dPose');
