@@ -1,4 +1,4 @@
-function [ plan ] =WaveFrontPlanner(map,start,finish)
+function [ plan ] = wavefrontPlanner(map,start,finish)
 %NOTE mapGenerator must be run before this funciton b
 global DX
 global DY

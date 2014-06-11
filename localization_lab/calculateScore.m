@@ -1,5 +1,8 @@
-%caulates and displays the score of the run 
 function calculateScore(r,finish)
+%calculateScore Calculates and displays the score of the run
+%%% TODO Staff I don't know where to begin with this one
+% r
+% finish
 FT_TO_METERS = 0.3048;
 IN_TO_METERS = FT_TO_METERS/12;
 METERS_TO_IN = 1/IN_TO_METERS;

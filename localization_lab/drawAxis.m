@@ -1,5 +1,6 @@
-%draws an axis at the desired location
 function  drawAxis(x,y,zRot,scale)
+%drawAxis Draw an axis at the desired location
+
     hold on
     xs = [x x+scale*cos(zRot)];
     ys = [y y+scale*sin(zRot)];
