@@ -29,7 +29,7 @@ pM = normilize(pM);
 if p < .0001
     %we are not confident about our current position so planning based on
     %our best guess will not be very helpful.
-    dPose = lostMotion();
+    dPose = LostMotion();
 else
     gui(r,map,pM)
     path = WaveFrontPlanner(configMap,[belivedPose(1),belivedPose(2)],finish);
@@ -49,13 +49,13 @@ while(1)
     %the best guess of where we currently are
     [belivedPose(1),belivedPose(2),belivedPose(3),p] = getBestDistribution(pM);
     if p < .0001
-        dPose = lostMotion();
+        dPose = LostMotion();
         %determines the angle we should be at
         [pM,r] = update(r,dPose,map,pM);
     elseif atDesiredLocation(belivedPose,finish)
         path = WaveFrontPlanner(configMap,[belivedPose(1),belivedPose(2)],finish);
         if size(path,1) < 1 || (path(1,1) == -1 && length(path) == 1)
-            dPose = lostMotion();
+            dPose = LostMotion();
         else
             dPose = r.pose(1:3) - [path(1,1), path(1,2), r.pose(3)];
         end
@@ -80,72 +80,4 @@ calculateScore(r,finish);
 
 end
 
-function [pM,r] = update(r,dPose,map,pM)
-        dPose(3) = -wrapToPi(r.pose(3) - atan2(-dPose(2),-dPose(1)));
-        [pM,r] =move(pM,dPose,map,r);
-        gui(r,map,pM)
-        pause(.01)
-end
-
-
-% causes for the robot to sense and move based on the input vector dPose
-% which is the desired difrence in pose
-function [pM,r] = move(pM,dPose,map,r)
-global DX;
-global DY;
-global DTH;
-global STEPERROR
-
-%caps max attempted motion
-MAXSPEED = DX;
-MAXDTH = 10*DTH;
-if(abs(dPose(3)) > MAXDTH)
-    dPose(3) = MAXDTH*dPose(3)/abs(dPose(3));
-    dPose(1) = 0;
-    dPose(2) = 0;
-else
-    %only translate when we are close to the correct angle
-    if(abs(dPose(1)) > MAXSPEED)
-        dPose(1) = MAXSPEED*dPose(1)/abs(dPose(1));
-    end
-    if(abs(dPose(2)) > MAXSPEED)
-        dPose(2) = MAXSPEED*dPose(2)/abs(dPose(2));
-    end
-end
-dPose(3) = -dPose(3);
-%will check to see if motion is going to cause the robot to move into an
-%obstacle, if so then do not allow this motion and try to execute a small
-%random motion to get you away from the obstacle 
-while(1)
-    newPose =r.pose(1:3) -  dPose;
-    newPose(3) = wrapTo2Pi(newPose(3));
-    newPoseIndex(1) = round(newPose(1)/DX);
-    newPoseIndex(2) = round(newPose(2)/DY);
-    if newPoseIndex(1) > 0 && newPoseIndex(1) <= size(map,1) && ...
-        newPoseIndex(2) > 0 && newPoseIndex(2) <= size(map,2) && ...
-        map(newPoseIndex(1),newPoseIndex(2)) == 0
-        r.pose = newPose;
-        break;
-    else
-         dPose = rand(1,3)*.1;
-        'hit wall'
-    end
-end
-
-measurment = r.Sense(map);
-pM = transitionModel(pM,dPose');
-for i = 1:size(pM,3)
-    pM(:,:,i) = pM(:,:,i) + STEPERROR.*(~map);
-end
-pM = normilize(pM); %normilzes
-pM = observationModel(map,measurment,pM);
-pM = normilize(pM); %normilzes
-
-end
-
-
-%motion that should happen when we belive that the robot is lost 
-function dPose = lostMotion()
-    dPose = rand(1,3);
-end
 
