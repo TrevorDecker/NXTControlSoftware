@@ -1,31 +1,43 @@
+%TODO add comments 
+
+%must be run from inside LocalizationLab folder 
+
 function [] = LocalizationLab()
+
+%removes any old variables from the workspace 
+clear
+%updates path to include source files
+addpath('ProvidedCode','ForDrivingNXT','StudentsNeedToEdit')
+
+
 global DTH;      %Discrimination along th
 global ROBOTMODEL;
 global MAXERRORTH;
-
-config();
+Config();
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%  SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %coordinates x,y,th
-start  = [0.9,1.0,pi/2];
-finish = [0.2,0.2,1.0];
+start  = [0.9,1.0,pi/2]; %TODO move to pose class
+finish = [0.2,0.2,1.0];  %TODO move to pose class
+
+%TODO remvoe because pose class should take care of this 
 finish(3) = wrapTo2Pi(finish(3)); %for end error checking
 
-map = mapGenerator;
-configMap = calculateConfigurationSpace(map,1);
+map = MapGenerator;
+configMap = CalculateConfigurationSpace(map,1);
 
 %sets up the robot 
-r = robot(start(1),start(2),start(3));
+r = Robot(start(1),start(2),start(3));
 r.setModel(ROBOTMODEL,'r');
 
 %pM stands for probability map 
-pM = ones(size(map,1),size(map,2),2*pi/DTH);
-pM = normilize(pM);
+pM = ones(size(map,1),size(map,2),floor(2*pi/DTH));
+pM = Normalize(pM);
 
 %the best guess of where we currently are
-[belivedPose(1),belivedPose(2),belivedPose(3),p] = getBestDistribution(pM);
+[belivedPose(1),belivedPose(2),belivedPose(3),p] = GetBestDistribution(pM);
 if p < .0001
     %we are not confident about our current position so planning based on
     %our best guess will not be very helpful.
@@ -38,8 +50,8 @@ else
     end
 end
 
-[pM,r] =move(pM,[0,0,0],map,r);
-gui(r,map,pM)
+[pM,r] =Move(pM,[0,0,0],map,r);
+GUI(r,map,pM)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%  search loop %%%%%%%%%%%%%%%%%%%%%
@@ -47,11 +59,11 @@ gui(r,map,pM)
 while(1)
     %while(size(path,1) > 0 )
     %the best guess of where we currently are
-    [belivedPose(1),belivedPose(2),belivedPose(3),p] = getBestDistribution(pM);
+    [belivedPose(1),belivedPose(2),belivedPose(3),p] = GetBestDistribution(pM);
     if p < .0001
         dPose = LostMotion();
         %determines the angle we should be at
-        [pM,r] = update(r,dPose,map,pM);
+        [pM,r] = Update(r,dPose,map,pM);
     elseif atDesiredLocation(belivedPose,finish)
         path = WaveFrontPlanner(configMap,[belivedPose(1),belivedPose(2)],finish);
         if size(path,1) < 1 || (path(1,1) == -1 && length(path) == 1)
@@ -75,8 +87,8 @@ while(1)
         
     end
 end
-gui(r,map,pM)
-calculateScore(r,finish);
+GUI(r,map,pM)
+CalculateScore(r,finish);
 
 end
 
