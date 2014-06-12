@@ -15,14 +15,14 @@ clf();
 subplot(1,2,1)
 PlotMap(map,1);
 r.DrawRobot()
-[x,y,th,p] = GetBestDistribution(pMap);
-br = Robot(x,y,th);%belived robot for visulizing the belived robo 
+[thisPose,p] = GetBestDistribution(pMap);
+br = Robot(thisPose);%belived robot for visulizing the belived robo 
 br.setModel([-.05, -.05, 0 , 0.05, 0;
             .05, -.05, -0.05, 0 ,0.05;
              1,1,1,1,1],'g');
 
 br.DrawRobot();
-th = mod(round(th/DTH)-1,size(pMap,3) -1)+1;
+th = mod(round(thisPose.getTh()/DTH)-1,size(pMap,3) -1)+1;
 subplot(1,2,2)
 PlotMap(pMap(:,:,th),0)
 end

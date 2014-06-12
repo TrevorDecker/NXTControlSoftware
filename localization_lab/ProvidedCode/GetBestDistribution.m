@@ -9,7 +9,7 @@
 
 %Given an array of maps we extract the state which is most likely to
 %estimate the position of the robot correctly 
-function [x,y,th,p] = GetBestDistribution(pM)
+function [thisPose,p] = GetBestDistribution(pM)
   global DX;
   global DY;
   global DTH;
@@ -19,6 +19,8 @@ function [x,y,th,p] = GetBestDistribution(pM)
    y = 0;
    th = 0;
    p = 0;
+   thisPose = Pose(x,y,th);
+
     best = max(max(max(pM)));
     for i = 1:size(pM,1)
         for j = 1:size(pM,2)
@@ -28,6 +30,7 @@ function [x,y,th,p] = GetBestDistribution(pM)
                     y = j*DY;
                     th = k*DTH;
                     p = best;
+                    thisPose = Pose(x,y,th);
                     return
                 end
             end

@@ -7,39 +7,43 @@ global DX;
 global DY;
 global DTH;
 global STEPERROR
+assert(isa(dPose,'Pose'));
 
 %caps max attempted motion
 MAXSPEED = DX;
 MAXDTH = 10*DTH;
-if(abs(dPose(3)) > MAXDTH)
-    dPose(3) = MAXDTH*dPose(3)/abs(dPose(3));
-    dPose(1) = 0;
-    dPose(2) = 0;
+if(abs(dPose.getTh) > MAXDTH)
+    dPose.setTh(MAXDTH*dPose.getTh()/abs(dPose.getTh()));
+    dPose.setTh(0);
+    dPose.setTh(0);
 else
     %only translate when we are close to the correct angle
-    if(abs(dPose(1)) > MAXSPEED)
-        dPose(1) = MAXSPEED*dPose(1)/abs(dPose(1));
+    if(abs(dPose.getX()) > MAXSPEED)
+        dPose.setX(MAXSPEED*dPose.getX()/abs(dPose.getX()));
     end
-    if(abs(dPose(2)) > MAXSPEED)
-        dPose(2) = MAXSPEED*dPose(2)/abs(dPose(2));
+    if(abs(dPose.getY()) > MAXSPEED)
+        dPose.setY(MAXSPEED*dPose.getY()/abs(dPose.getY()));
     end
 end
-dPose(3) = -dPose(3);
+
+
+dPose.setTh(-dPose.getTh()); %STAFF TODO WHY IS THIS HERE
+
+
 %will check to see if motion is going to cause the robot to move into an
 %obstacle, if so then do not allow this motion and try to execute a small
 %random motion to get you away from the obstacle 
 while(1)
-    newPose =r.pose(1:3) -  dPose;
-    newPose(3) = wrapTo2Pi(newPose(3));
-    newPoseIndex(1) = round(newPose(1)/DX);
-    newPoseIndex(2) = round(newPose(2)/DY);
+    newPose =r.pose -  dPose;
+    newPoseIndex(1) = round(newPose.getX()./DX);
+    newPoseIndex(2) = round(newPose.getY()./DY);
     if newPoseIndex(1) > 0 && newPoseIndex(1) <= size(map,1) && ...
         newPoseIndex(2) > 0 && newPoseIndex(2) <= size(map,2) && ...
         map(newPoseIndex(1),newPoseIndex(2)) == 0
         r.pose = newPose;
         break;
     else
-         dPose = rand(1,3)*.1;
+        LostMotion();
         'hit wall'
     end
 end

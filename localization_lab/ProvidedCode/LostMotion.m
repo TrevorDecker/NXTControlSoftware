@@ -8,5 +8,5 @@
 
 %motion that should happen when we belive that the robot is lost 
 function dPose = LostMotion()
-    dPose = rand(1,3);
+    dPose = Pose(rand,rand,rand);
 end

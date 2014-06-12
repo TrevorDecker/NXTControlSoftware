@@ -5,7 +5,7 @@
 classdef Robot < handle
     
     properties
-        pose = [];
+        pose = Pose();
         WHEELRADIUS = .1; %meters
         AXLELENGTH = .5;%assuming both wheels are equal spaced from the center of the robot
         modelColor = 'r';%default color is red
@@ -13,8 +13,8 @@ classdef Robot < handle
     end
     
     methods
-        function thisRobot = Robot(x,y,th)
-            thisRobot.pose = [x,y,th];
+        function thisRobot = Robot(startPose)
+            thisRobot.pose = startPose;
         end
         
         function setModel(thisRobot,newModel,newModelColor)
@@ -27,12 +27,10 @@ classdef Robot < handle
         end
         
         function DrawRobot(thisRobot)
-            x  = thisRobot.pose(1);
-            y  = thisRobot.pose(2);
-            th = thisRobot.pose(3);
-            H = [cos(th) -sin(th) x;
-                sin(th) cos(th) y;
-                0         0     1;];
+            x  = thisRobot.pose.getX();
+            y  = thisRobot.pose.getY();
+            th = thisRobot.pose.getTh();
+            H = thisRobot.pose.getHomogeneousMatrix();
             robot = H*thisRobot.model;
             hold on;
             %is just above the map
@@ -53,8 +51,8 @@ classdef Robot < handle
             for th = minAngle:dAngle:maxAngle
                 d = 0;
                while d < MAXD
-                   x = round((cos(th+thisRobot.pose(3))*d + thisRobot.pose(1))/DX);
-                   y = round((sin(th+thisRobot.pose(3))*d + thisRobot.pose(2))/DY); 
+                   x = round((cos(th+thisRobot.pose.getTh())*d + thisRobot.pose.getX())/DX);
+                   y = round((sin(th+thisRobot.pose.getTh())*d + thisRobot.pose.getY())/DY); 
                    if(x>0 && x < size(map,1) && y > 0 && y < size(map,2))
                        if(map(x,y) == 2)
                            objects = cat(1,objects,[th, d]);%d %bearing only instead of distince
